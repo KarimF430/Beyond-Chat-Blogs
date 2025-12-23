@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom';
 import './ArticleCard.css';
 
 export default function ArticleCard({ article }) {
-    const date = new Date(article.created_at).toLocaleDateString('en-US', {
+    // Use real author from API, fallback to BeyondChats Team
+    const author = article.author || 'BEYONDCHATS TEAM';
+
+    // Use published_at for display (actual publication date), fallback to created_at
+    const displayDate = article.published_at || article.created_at;
+    const date = new Date(displayDate).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
@@ -45,7 +50,7 @@ export default function ArticleCard({ article }) {
 
                 {/* Meta */}
                 <div className="article-meta">
-                    <span className="author">SIMRAN JAIN</span>
+                    <span className="author">{author.toUpperCase()}</span>
                     <span className="separator">/</span>
                     <span className="date">{date}</span>
                 </div>

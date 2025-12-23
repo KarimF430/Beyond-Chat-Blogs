@@ -106,7 +106,13 @@ export default function ArticlePage() {
     }
 
     const isEnhanced = article.status === 'updated';
-    const date = new Date(article.created_at).toLocaleDateString('en-US', {
+
+    // Use real author from API, fallback to BeyondChats Team
+    const author = article.author || 'BeyondChats Team';
+
+    // Use published_at for display (actual publication date), fallback to created_at
+    const displayDate = article.published_at || article.created_at;
+    const date = new Date(displayDate).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
@@ -150,7 +156,7 @@ export default function ArticlePage() {
                     <header className="article-header">
                         <h1>{article.title}</h1>
                         <div className="article-meta">
-                            <span className="author-name">SIMRAN JAIN</span>
+                            <span className="author-name">{author.toUpperCase()}</span>
                             <span className="meta-separator">•</span>
                             <span className="article-date">{date}</span>
                             <span className="meta-separator">•</span>

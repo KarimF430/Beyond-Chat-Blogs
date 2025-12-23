@@ -10,6 +10,7 @@ export default function HomePage() {
     const [filter, setFilter] = useState('updated');
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [topicFilter, setTopicFilter] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const articlesPerPage = 10;
@@ -30,14 +31,24 @@ export default function HomePage() {
         }
     }
 
-    // Filter and search articles
+    // Filter and search articles, then sort by date (newest first)
     const filteredArticles = articles
         .filter(a => filter === 'all' || a.status === filter)
         .filter(a =>
             searchQuery === '' ||
             a.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             a.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        )
+        .filter(a =>
+            topicFilter === '' ||
+            a.title?.toLowerCase().includes(topicFilter.toLowerCase()) ||
+            a.excerpt?.toLowerCase().includes(topicFilter.toLowerCase())
+        )
+        .sort((a, b) => {
+            const dateA = new Date(a.published_at || a.created_at);
+            const dateB = new Date(b.published_at || b.created_at);
+            return dateB - dateA; // Newest first
+        });
 
     // Pagination
     const totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
@@ -50,7 +61,7 @@ export default function HomePage() {
     // Reset to page 1 when filter or search changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [filter, searchQuery]);
+    }, [filter, searchQuery, topicFilter]);
 
     // Generate page numbers
     const getPageNumbers = () => {
@@ -157,12 +168,12 @@ export default function HomePage() {
                     {['AI Chatbots', 'Customer Support', 'Lead Generation', 'Healthcare', 'Small Business', 'SEO', 'Virtual Assistants', 'E-commerce', 'Conversational AI', 'Customer Experience'].map(topic => (
                         <button
                             key={topic}
-                            className={`topic-tag ${searchQuery === topic ? 'active' : ''}`}
+                            className={`topic-tag ${topicFilter === topic ? 'active' : ''}`}
                             onClick={() => {
-                                if (searchQuery === topic) {
-                                    setSearchQuery('');
+                                if (topicFilter === topic) {
+                                    setTopicFilter('');
                                 } else {
-                                    setSearchQuery(topic);
+                                    setTopicFilter(topic);
                                 }
                             }}
                         >

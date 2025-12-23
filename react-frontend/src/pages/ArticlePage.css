@@ -50,11 +50,12 @@
 }
 
 .article-header h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 800;
     color: #1e293b;
     margin-bottom: 0.75rem;
-    line-height: 1.3;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 /* Meta Line */
@@ -233,7 +234,8 @@
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    margin: 1.5rem 0;
+    margin: 1.5rem auto;
+    display: block;
 }
 
 /* Responsive Video Embeds */
@@ -786,11 +788,18 @@
 /* ===== DESKTOP (1024px+) ===== */
 @media (min-width: 1024px) {
     .article-header h1 {
-        font-size: 2.25rem;
+        font-size: 2.75rem;
+        line-height: 1.15;
     }
 
     .article-body {
-        font-size: 1.0625rem;
+        font-size: 1.125rem;
+        line-height: 1.8;
+    }
+
+    .article-body p:first-of-type {
+        font-size: 1.25rem;
+        line-height: 1.6;
     }
 
     .related-article-card:hover {

@@ -60,8 +60,17 @@ class ArticleScraper
                 : null;
             $excerpt = $excerpt ? trim($excerpt) : null;
             
+            // Extract author name from embedded data
+            $author = null;
+            if (isset($post['_embedded']['author'][0]['name'])) {
+                $author = $post['_embedded']['author'][0]['name'];
+            }
+            
+            // Extract published date
+            $publishedAt = isset($post['date']) ? $post['date'] : null;
+            
             if ($existing) {
-                // Update featured image and excerpt if missing
+                // Update featured image, excerpt, author, and published_at if missing
                 $updates = [];
                 if (!$existing->featured_image) {
                     $featuredImage = $this->extractFeaturedImage($post);
@@ -71,6 +80,12 @@ class ArticleScraper
                 }
                 if (!$existing->excerpt && $excerpt) {
                     $updates['excerpt'] = $excerpt;
+                }
+                if (!$existing->author && $author) {
+                    $updates['author'] = $author;
+                }
+                if (!$existing->published_at && $publishedAt) {
+                    $updates['published_at'] = $publishedAt;
                 }
                 if (!empty($updates)) {
                     $existing->update($updates);
@@ -89,6 +104,8 @@ class ArticleScraper
                 'title' => $title,
                 'content' => $content,
                 'excerpt' => $excerpt,
+                'author' => $author,
+                'published_at' => $publishedAt,
                 'featured_image' => $featuredImage,
                 'original_url' => $post['link'],
                 'status' => 'original',

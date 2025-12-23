@@ -11,6 +11,8 @@ class Article extends Model
         'title',
         'content',
         'excerpt',
+        'author',
+        'published_at',
         'featured_image',
         'original_url',
         'status',
@@ -21,6 +23,7 @@ class Article extends Model
     protected $casts = [
         'references' => 'array',
         'gap_analysis' => 'array',
+        'published_at' => 'datetime',
     ];
 
     /**
