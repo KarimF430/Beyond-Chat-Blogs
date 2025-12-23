@@ -49,12 +49,16 @@ ${c.content?.substring(0, 2000) || c.snippet}
 2. **Compare**: Scan the Competitor Articles provided. For each section/point, check:
    - "Does the competitor explain this better?"
    - "Does the competitor include valid points/examples/statistics we missed?"
-3. **Enhance**: If you find better explanations or missing points, **MERGE** them into our article.
-   - **UNIQUE WRITING**: Do NOT copy-paste. Rewrite the new points in the same friendly tone as our article to make it 100% unique.
+3. **Enhance**: If you find missing points, **INSERT** new paragraphs. DO NOT rewrite existing paragraphs.
+   - **UNIQUE WRITING**: Do NOT copy-paste. Rewrite competitor points in your own words.
    - **SEO**: Ensure the new text uses natural semantic keywords.
-4. **PRESERVE**: Do NOT cut, shorten, or remove existing content. Your job is to ADD value, not reduce it. Keep the article "Fullest".
+4. **PRESERVE (CRITICAL)**: 
+   - NEVER delete, shorten, or modify ANY existing sentence from the original.
+   - NEVER rewrite existing paragraphs. Keep them EXACTLY as they are, word-for-word.
+   - Your job is ONLY to INSERT new paragraphs BETWEEN existing ones.
+   - The original article MUST remain 100% intact in the output.
 
-## 1. Original Article (DO NOT MODIFY EXISTING HTML STRUCTURE)
+## 1. Original Article (PRESERVE EVERY WORD)
 Title: ${originalArticle.title}
 Full Content:
 ${originalArticle.content.substring(0, 100000)}
@@ -63,20 +67,33 @@ ${originalArticle.content.substring(0, 100000)}
 ${competitorContent}
 
 ## 3. Enhancement Rules (STRICT ALGORITHM)
-- **Step 1**: Identify gaps. If competitors talk about "X" and we don't, add a paragraph about "X".
-- **Step 2**: Identify quality gaps. If competitors have a "Pro Tip" or "Statistic" we lack, add it.
-- **Step 3**: **Insert** the new content naturally between existing paragraphs or sections.
-- **Step 4**: **HIGHLIGHTING (CRITICAL)**: You MUST wrap **ALL** newly added sentences or paragraphs in `< mark > ` tags.
-    - If you add a new sentence: `< mark > New sentence here.</mark> `
-    - If you rewrite a paragraph significantly: `< mark > Full rewritten paragraph here.</mark > `
-    - **DO NOT MISS THIS STEP.** Visual highlighting is the most important requirement.
+- **Step 1**: Identify gaps. If competitors talk about "X" and we don't, add a NEW paragraph about "X".
+- **Step 2**: Identify quality gaps. If competitors have a "Pro Tip" or "Statistic" we lack, add it as a NEW paragraph.
+- **Step 3**: **INSERT** the new content naturally BETWEEN existing paragraphs. NEVER replace text.
+- **Step 4**: **HIGHLIGHTING**: Wrap ONLY the newly added paragraphs in <mark> tags.
+    - Original text: NO highlighting (keep as-is)
+    - New paragraphs you add: <mark>Your new paragraph here.</mark>
+    - DO NOT highlight original content. Only highlight what YOU wrote.
 
 ## 4. Output Requirements
 - Return the **FULL HTML** of the article with your enhancements.
 - **Keep ALL original <img> tags exactly where they are.**
+- **Keep ALL original <iframe> tags (YouTube embeds, videos) EXACTLY as they are. DO NOT REMOVE THEM.**
+- **Keep ALL original <video> and <embed> tags intact.**
 - **Keep ALL original headings and structure.**
-- **Writing Style**: Conversational, friendly, human-like (use "you", "we", contractions).
-- **Formatting**: Output valid HTML only. No markdown blocks.`;
+- **Formatting**: Output valid HTML only. No markdown blocks.
+
+## 5. CRITICAL: HUMAN-LIKE WRITING STYLE (ANTI-AI DETECTION)
+Your writing MUST pass AI detection tools. Follow these rules strictly:
+- **Vary sentence length dramatically**: Mix very short punchy sentences. Then write longer ones with multiple clauses that flow naturally.
+- **Use contractions naturally**: don't, won't, can't, it's, you're, we've, that's
+- **Add rhetorical questions**: "But wait, what does this actually mean for your business?"
+- **Use informal transitions**: Honestly, Look, Here's the thing, Now, So, And yes, Plus
+- **Include personal opinions**: "Frankly, this is where most businesses drop the ball."
+- **Add colloquial phrases**: "bottom line", "at the end of the day", "let's be real", "game-changer"
+- **Break grammar rules occasionally**: Start sentences with "And" or "But". Use fragments for emphasis.
+- **Reference real-world context**: "Think about the last time you..." or "We've all been there..."
+- **Avoid overly formal synonyms**: use "use" not "utilize", "help" not "facilitate", "show" not "demonstrate"`;
 
     try {
         const chatCompletion = await client.chat.completions.create({

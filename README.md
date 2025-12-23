@@ -1,155 +1,228 @@
-# 🚀 BeyondChats Full-Stack Assignment
+# 🤖 BeyondChats AI Content Enhancement Platform
 
-A complete article scraping, AI-powered content enhancement, and display system.
+> An intelligent content enhancement system that uses AI to analyze, compare, and improve blog articles by learning from top-ranking competitors.
+
+[![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+
+---
+
+## 📖 Project Overview
+
+This platform automatically enhances blog articles using AI by:
+
+1. **Scraping** original articles from BeyondChats blog
+2. **Searching** Google for top-ranking competitor articles on the same topic
+3. **Analyzing** content gaps between original and competitors
+4. **Enhancing** articles with AI-generated additions (highlighted in yellow)
+5. **Preserving** all original content while adding new value
+
+### ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Smart Gap Analysis** | AI compares your content against competitors to find missing topics |
+| 📝 **Content Enhancement** | Adds new paragraphs while preserving 100% of original content |
+| 🎨 **Visual Highlighting** | New AI-added content is highlighted in yellow for easy identification |
+| 🔒 **XSS Protection** | All content sanitized with DOMPurify before rendering |
+| 🌐 **SEO-Friendly URLs** | Clean slugs like `/articles/chatbot-benefits` |
+| 💬 **Human-Like Writing** | AI writes in conversational tone to pass AI detection tools |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        FRONTEND (React + Vite)                  │
+│                         http://localhost:5173                   │
+│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐  │
+│  │  HomePage   │  │ ArticlePage  │  │  Components (Cards,    │  │
+│  │  (List)     │  │ (Detail)     │  │  Footer, GapAnalysis)  │  │
+│  └─────────────┘  └──────────────┘  └────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ REST API
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    BACKEND (Laravel API)                        │
+│                     http://localhost:8000                       │
+│  ┌─────────────────┐  ┌──────────────────┐  ┌────────────────┐  │
+│  │ ArticleController│  │ Article Model    │  │ MySQL Database │  │
+│  │ (CRUD + Slug)   │  │ (Soft Deletes)   │  │ (articles,     │  │
+│  └─────────────────┘  └──────────────────┘  │  competitors)  │  │
+│                                             └────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+                             ▲
+                             │ HTTP Requests
+                             │
+┌─────────────────────────────────────────────────────────────────┐
+│                    AI WORKER (Node.js)                          │
+│  ┌────────────────┐  ┌────────────────┐  ┌────────────────────┐ │
+│  │ Google Searcher │  │ Web Scraper    │  │ LLM Enhancer      │ │
+│  │ (Find rivals)   │  │ (Extract text) │  │ (Llama 3 via Groq)│ │
+│  └────────────────┘  └────────────────┘  └────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 How the AI Enhancement Works
+
+```mermaid
+flowchart LR
+    A[Original Article] --> B[Google Search]
+    B --> C[Scrape Top 3 Competitors]
+    C --> D[Gap Analysis LLM]
+    D --> E[Content Enhancement LLM]
+    E --> F[Enhanced Article with Highlights]
+```
+
+### Step-by-Step Process:
+
+1. **Input**: Original BeyondChats article (scraped from their blog)
+2. **Search**: Query Google for the article's topic, get top-ranking URLs
+3. **Scrape**: Extract content from competitor articles
+4. **Analyze**: LLM identifies what competitors cover that we don't
+5. **Enhance**: LLM adds new paragraphs (wrapped in `<mark>` tags)
+6. **Output**: Enhanced article with original content preserved + new highlighted additions
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- PHP 8.1+ & Composer
+- Node.js 18+
+- MySQL 8.0+
+
+### 1. Clone & Setup
+
+```bash
+git clone https://github.com/YOUR_USERNAME/beyondchats-enhancement.git
+cd beyondchats-enhancement
+```
+
+### 2. Backend (Laravel API)
+
+```bash
+cd laravel-api
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+### 3. Frontend (React)
+
+```bash
+cd react-frontend
+npm install
+npm run dev
+```
+
+### 4. AI Worker (Node.js)
+
+```bash
+cd node-script
+npm install
+cp .env.example .env
+# Add your GROQ_API_KEY to .env
+npm run enhance:all
+```
+
+---
+
+## 🔑 Environment Variables
+
+### Laravel API (`laravel-api/.env`)
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_DATABASE=beyondchats
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### Node Worker (`node-script/.env`)
+```env
+LARAVEL_API_URL=http://127.0.0.1:8000/api
+GROQ_API_KEY=your_free_groq_api_key
+GOOGLE_API_KEY=your_google_custom_search_key
+GOOGLE_CX=your_search_engine_id
+```
+
+---
 
 ## 📁 Project Structure
 
 ```
 Beyond Chats Assignment/
-├── laravel-api/          # Backend API (PHP/Laravel)
-├── node-script/          # Content Enhancement (Node.js)
-├── react-frontend/       # Frontend UI (React/Vite)
-└── README.md
+├── laravel-api/              # Backend REST API
+│   ├── app/Http/Controllers/ # API endpoints
+│   ├── app/Models/           # Eloquent models
+│   └── database/migrations/  # DB schema
+│
+├── react-frontend/           # Frontend SPA
+│   ├── src/pages/            # HomePage, ArticlePage
+│   ├── src/components/       # Reusable UI components
+│   └── src/services/         # API client
+│
+└── node-script/              # AI Enhancement Worker
+    ├── processAll.js         # Main orchestrator
+    └── services/
+        ├── llmEnhancer.js    # Groq/Llama 3 integration
+        ├── googleSearcher.js # Google Custom Search
+        └── scraper.js        # Web content extraction
 ```
-
-## 🔄 Data Flow Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        PHASE 1: Data Collection                      │
-├─────────────────────────────────────────────────────────────────────┤
-│  BeyondChats Blog ──────> WordPress REST API ──────> Laravel DB     │
-│  (5 oldest articles)       (Scraping)              (SQLite)         │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     PHASE 2: Content Enhancement                     │
-├─────────────────────────────────────────────────────────────────────┤
-│  Laravel API ──> Node.js ──> DuckDuckGo ──> Scrape 5 Competitors    │
-│      │              │                              │                 │
-│      │              ▼                              │                 │
-│      │      Google Gemini AI                       │                 │
-│      │         (Enhance + Gap Analysis)            │                 │
-│      │              │                              │                 │
-│      ◄──────────────┴──────────────────────────────┘                │
-│  (Publish enhanced article with citations)                          │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                     PHASE 3: Display                                 │
-├─────────────────────────────────────────────────────────────────────┤
-│  React Frontend ◄──────── Laravel API                               │
-│  - Article List (Original 🟦 / Enhanced 🟩)                         │
-│  - Gap Analysis Panel (🔴 Missing, 🟡 Improve, 🟢 Strengths)        │
-│  - Competitor Articles Reference                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-## 🛠️ Local Setup Instructions
-
-### Prerequisites
-- PHP 8.1+ with Composer
-- Node.js 18+
-- Google Gemini API Key (free: https://makersuite.google.com/app/apikey)
-
-### 1️⃣ Laravel Backend
-
-```bash
-cd laravel-api
-
-# Install dependencies
-composer install
-
-# Create database and run migrations
-php artisan migrate
-
-# Scrape initial articles
-php artisan serve &
-curl -X POST http://127.0.0.1:8000/api/scrape
-
-# Keep server running on port 8000
-php artisan serve --host=0.0.0.0 --port=8000
-```
-
-### 2️⃣ Node.js Enhancement Script
-
-```bash
-cd node-script
-
-# Install dependencies
-npm install
-
-# Copy environment template
-cp .env.example .env
-
-# Add your Gemini API key to .env
-# GEMINI_API_KEY=your_key_here
-
-# Run the enhancement (requires Laravel API running)
-npm start
-```
-
-### 3️⃣ React Frontend
-
-```bash
-cd react-frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Open http://localhost:5173
-```
-
-## 📡 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/articles` | List all articles (filter: ?status=original) |
-| GET | `/api/articles/{id}` | Get single article |
-| POST | `/api/articles` | Create article |
-| PUT | `/api/articles/{id}` | Update article |
-| DELETE | `/api/articles/{id}` | Delete article |
-| GET | `/api/articles-latest` | Get latest original article |
-| GET | `/api/articles/{id}/competitors` | Get competitor articles |
-| POST | `/api/scrape` | Trigger BeyondChats scraping |
-
-## 🎨 Frontend Features
-
-- **Dark Theme** with modern gradients
-- **Filter Articles**: All / Original / Enhanced
-- **Gap Analysis Panel**: Color-coded insights
-  - 🔴 Missing topics
-  - 🟡 Areas to improve
-  - 🟢 Strengths
-  - 💡 Recommendations
-- **Competitor Cards**: Reference articles shown
-- **Responsive Design**: Mobile-friendly
-
-## 🔗 Live Demo
-
-Frontend: [Coming Soon - Deploy to Vercel]
-
-## 📝 Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| Backend | Laravel 12 + PHP 8.5 |
-| Database | SQLite |
-| Script | Node.js + ES Modules |
-| LLM | Google Gemini (Free) |
-| Search | DuckDuckGo / SerpAPI |
-| Frontend | React 18 + Vite |
-| Styling | Vanilla CSS (Dark Theme) |
-
-## 👤 Author
-
-Built for BeyondChats Assignment
 
 ---
 
-Made with ❤️ using Laravel, Node.js, and React
+## 🛡️ Security Features
+
+| Feature | Implementation |
+|---------|----------------|
+| **XSS Protection** | DOMPurify sanitizes all HTML before rendering |
+| **Input Validation** | Laravel request validation on all API endpoints |
+| **Soft Deletes** | Articles are never permanently deleted |
+| **CORS** | Configured for frontend-backend communication |
+
+---
+
+## 📊 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/articles` | List all articles (filter by status) |
+| `GET` | `/api/articles/{slug}` | Get single article by slug |
+| `POST` | `/api/articles` | Create new article |
+| `PUT` | `/api/articles/{slug}` | Update article |
+| `DELETE` | `/api/articles/{slug}` | Soft delete article |
+| `GET` | `/api/articles/{slug}/competitors` | Get competitor analysis |
+
+---
+
+## 🎯 Assignment Requirements Checklist
+
+- [x] **Phase 1**: Laravel API with MySQL storage
+- [x] **Phase 2**: Node.js AI enhancement worker
+- [x] **Phase 3**: React frontend with article comparison
+- [x] **Bonus**: Gap analysis with visual highlighting
+- [x] **Bonus**: Competitor article references
+
+---
+
+## 📝 License
+
+MIT License - Feel free to use this project for learning and portfolio purposes.
+
+---
+
+## 👤 Author
+
+**Rachit Simac**
+
+---
+
+*Built with ❤️ for the BeyondChats Assignment*
