@@ -26,12 +26,14 @@ export async function searchRelatedArticles(title, count = 5) {
 
 /**
  * Search using SerpAPI (recommended for production)
+ * Excludes beyondchats.com to get competitor articles only
  */
 async function searchWithSerpAPI(query, count) {
     try {
         const response = await axios.get('https://serpapi.com/search', {
             params: {
-                q: query + ' blog article',
+                // Exclude beyondchats.com to get only competitor articles
+                q: query + ' blog article -site:beyondchats.com',
                 api_key: SERP_API_KEY,
                 num: count + 5, // Get extra to filter
                 engine: 'google',
@@ -40,9 +42,10 @@ async function searchWithSerpAPI(query, count) {
 
         const results = response.data.organic_results || [];
 
-        // Filter to get only blog/article pages
+        // Filter to get only blog/article pages and exclude beyondchats.com
         const filteredResults = results
             .filter(r => isBlogOrArticle(r.link, r.title))
+            .filter(r => !r.link.toLowerCase().includes('beyondchats.com'))
             .slice(0, count)
             .map(r => ({
                 title: r.title,
@@ -50,7 +53,7 @@ async function searchWithSerpAPI(query, count) {
                 snippet: r.snippet || '',
             }));
 
-        console.log(`✅ Found ${filteredResults.length} articles via SerpAPI`);
+        console.log(`✅ Found ${filteredResults.length} competitor articles (excluding BeyondChats)`);
         return filteredResults;
     } catch (error) {
         console.error('SerpAPI search failed:', error.message);
@@ -60,10 +63,12 @@ async function searchWithSerpAPI(query, count) {
 
 /**
  * Search using DuckDuckGo (free, no API key)
+ * Also excludes beyondchats.com
  */
 async function searchWithDuckDuckGo(query, count) {
     try {
-        const searchQuery = encodeURIComponent(query + ' blog article guide');
+        // Add -site:beyondchats.com to exclude BeyondChats articles
+        const searchQuery = encodeURIComponent(query + ' blog article guide -site:beyondchats.com');
         const url = `https://html.duckduckgo.com/html/?q=${searchQuery}`;
 
         const response = await axios.get(url, {
@@ -93,13 +98,14 @@ async function searchWithDuckDuckGo(query, count) {
                 }
             }
 
-            if (url && title && isBlogOrArticle(url, title)) {
+            // Exclude beyondchats.com from results
+            if (url && title && isBlogOrArticle(url, title) && !url.toLowerCase().includes('beyondchats.com')) {
                 results.push({ title, url, snippet });
             }
         });
 
         const finalResults = results.slice(0, count);
-        console.log(`✅ Found ${finalResults.length} articles via DuckDuckGo`);
+        console.log(`✅ Found ${finalResults.length} competitor articles via DuckDuckGo (excluding BeyondChats)`);
         return finalResults;
     } catch (error) {
         console.error('DuckDuckGo search failed:', error.message);

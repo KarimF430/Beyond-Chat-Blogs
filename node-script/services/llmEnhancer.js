@@ -1,36 +1,36 @@
 /**
  * LLM Enhancer Service
- * Uses Google Gemini to enhance article content
+ * Uses Groq (free tier) with Llama 3 for article enhancement
  */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-let genAI = null;
+let groq = null;
 
 /**
- * Initialize the Gemini AI client
+ * Initialize the Groq client
  */
 function initializeClient() {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here') {
-        throw new Error('GEMINI_API_KEY is not set. Please add it to your .env file.');
+    if (!GROQ_API_KEY || GROQ_API_KEY === 'your_groq_api_key_here') {
+        throw new Error('GROQ_API_KEY is not set. Get a free key at https://console.groq.com/keys');
     }
 
-    if (!genAI) {
-        genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    if (!groq) {
+        groq = new Groq({ apiKey: GROQ_API_KEY });
     }
 
-    return genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    return groq;
 }
 
 /**
  * Enhance article content using competitor articles as reference
  */
 export async function enhanceArticle(originalArticle, competitorArticles) {
-    console.log('🤖 Enhancing article with Gemini AI...');
+    console.log('🤖 Enhancing article with Llama 3 (via Groq)...');
 
-    const model = initializeClient();
+    const client = initializeClient();
 
     // Prepare competitor content summaries
     const competitorContent = competitorArticles
@@ -90,9 +90,14 @@ Enhance the original article to match or exceed the quality of the top-ranking c
 Return ONLY the enhanced HTML article. No markdown, no explanations.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const enhancedContent = response.text();
+        const chatCompletion = await client.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.7,
+            max_tokens: 8000,
+        });
+
+        const enhancedContent = chatCompletion.choices[0]?.message?.content || '';
 
         console.log('✅ Article enhanced successfully');
 
@@ -110,9 +115,9 @@ Return ONLY the enhanced HTML article. No markdown, no explanations.`;
  * Perform gap analysis comparing original article to competitors
  */
 export async function performGapAnalysis(originalArticle, competitorArticles) {
-    console.log('🔍 Performing gap analysis...');
+    console.log('🔍 Performing gap analysis with Llama 3...');
 
-    const model = initializeClient();
+    const client = initializeClient();
 
     const competitorContent = competitorArticles
         .map((c, i) => `
@@ -143,9 +148,14 @@ Compare the original with competitors and return a JSON object with:
 Return ONLY valid JSON, no markdown formatting or explanation.`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let analysisText = response.text();
+        const chatCompletion = await client.chat.completions.create({
+            messages: [{ role: 'user', content: prompt }],
+            model: 'llama-3.3-70b-versatile',
+            temperature: 0.3,
+            max_tokens: 2000,
+        });
+
+        let analysisText = chatCompletion.choices[0]?.message?.content || '{}';
 
         // Clean up potential markdown formatting
         analysisText = analysisText
