@@ -16,7 +16,7 @@ import { searchRelatedArticles } from './services/googleSearcher.js';
 import { scrapeMultipleArticles } from './services/contentScraper.js';
 import { enhanceArticle, performGapAnalysis } from './services/llmEnhancer.js';
 
-const COMPETITOR_COUNT = 5; // Number of competitor articles to fetch
+const COMPETITOR_COUNT = 2; // Number of competitor articles to fetch (top 2 from Google)
 
 /**
  * Main enhancement workflow

@@ -6,9 +6,16 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
+    "enhance": "node index.js",
+    "enhance:all": "node processAll.js",
     "test": "node test.js"
   },
-  "keywords": ["seo", "content", "llm", "scraping"],
+  "keywords": [
+    "seo",
+    "content",
+    "llm",
+    "scraping"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {

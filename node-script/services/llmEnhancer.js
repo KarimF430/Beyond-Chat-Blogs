@@ -21,7 +21,7 @@ function initializeClient() {
         genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
     }
 
-    return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    return genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 }
 
 /**
@@ -42,34 +42,52 @@ ${c.content?.substring(0, 2000) || c.snippet}
 `)
         .join('\n');
 
-    const prompt = `You are a professional SEO content editor specializing in creating human-like, engaging blog articles.
+    const prompt = `You are a professional SEO content editor. Your task is to enhance an article based on top-ranking competitor articles.
 
 ## Original Article
 Title: ${originalArticle.title}
 Content:
 ${stripHtml(originalArticle.content).substring(0, 5000)}
 
-## Reference Articles (Top-ranking competitors)
+## Reference Articles (Top 2 Ranking on Google)
 ${competitorContent}
 
-## Your Task
-Rewrite and enhance the original article to:
-1. **Improve SEO**: Better headings (H2, H3), keyword optimization, meta-friendly structure
-2. **Human Writing Style**: Conversational tone, engaging flow, avoid robotic AI-sounding text
-3. **Add Value**: Include insights from reference articles WITHOUT copying
-4. **Better Structure**: Clear introduction, numbered/bulleted lists, conclusion with CTA
-5. **Increase Depth**: Add relevant statistics, examples, or use cases
+## Your Enhancement Task
+Enhance the original article to match or exceed the quality of the top-ranking competitors:
+
+### SEO Improvements:
+- Use SEO-optimized headings (H2, H3) with target keywords
+- Improve meta-friendly structure with clear sections
+- Add relevant internal linking opportunities
+- Ensure keyword density matches competitor articles
+
+### Content Quality:
+- Match the depth and comprehensiveness of competitor articles
+- Add missing topics that competitors cover
+- Include relevant statistics, examples, and use cases
+- Create engaging introduction and strong conclusion with CTA
+
+### Formatting:
+- Use clear section headers (H2, H3)
+- Add bullet points and numbered lists where appropriate
+- Keep paragraphs short (2-4 sentences)
+- Match the professional tone of competitor articles
+
+## CRITICAL: Highlight Enhanced Content
+- Wrap ALL newly added or significantly modified text in <mark> tags
+- This shows readers what content was enhanced
+- Example: <mark>This is new content added for SEO improvement.</mark>
+- Original content that remains unchanged should NOT have mark tags
 
 ## IMPORTANT RULES
-- DO NOT copy sentences from reference articles
-- Write in a natural, human voice
-- Use active voice and engaging transitions
-- Keep paragraphs short (2-4 sentences max)
-- Output ONLY the enhanced article in clean HTML format
-- Start with a compelling H1 title
+- DO NOT copy sentences directly from reference articles
+- Write in natural, engaging, human-like prose
+- Keep the article's core message intact
+- Output ONLY the enhanced HTML article content
+- Start with the article title in an H1 tag
 
 ## Output Format
-Return ONLY the enhanced HTML article content. No explanations, just the article.`;
+Return ONLY the enhanced HTML article. No markdown, no explanations.`;
 
     try {
         const result = await model.generateContent(prompt);
