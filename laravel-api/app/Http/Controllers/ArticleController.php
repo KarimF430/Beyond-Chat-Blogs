@@ -79,6 +79,8 @@ class ArticleController extends Controller
             $article->save();
         }
 
+
+
         return response()->json([
             'success' => true,
             'message' => 'Article created successfully',
@@ -91,10 +93,17 @@ class ArticleController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $article = Article::with('competitorArticles')
-                    ->where('id', $id)
-                    ->orWhere('slug', $id)
-                    ->first();
+        // PostgreSQL requires type-correct comparisons
+        // Only query by id if $id is numeric, otherwise query by slug
+        if (is_numeric($id)) {
+            $article = Article::with('competitorArticles')
+                        ->where('id', $id)
+                        ->first();
+        } else {
+            $article = Article::with('competitorArticles')
+                        ->where('slug', $id)
+                        ->first();
+        }
         
         if (!$article) {
             return response()->json([
@@ -114,7 +123,9 @@ class ArticleController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
+        $article = is_numeric($id) 
+            ? Article::where('id', $id)->first() 
+            : Article::where('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
@@ -138,6 +149,8 @@ class ArticleController extends Controller
 
         $article->update($validated);
 
+
+
         return response()->json([
             'success' => true,
             'message' => 'Article updated successfully',
@@ -150,7 +163,9 @@ class ArticleController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
+        $article = is_numeric($id) 
+            ? Article::where('id', $id)->first() 
+            : Article::where('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
@@ -161,11 +176,15 @@ class ArticleController extends Controller
 
         $article->delete();
 
+
+
         return response()->json([
             'success' => true,
             'message' => 'Article deleted successfully'
         ]);
     }
+
+
 
     /**
      * Get the latest original article (for Node.js script)
@@ -194,7 +213,9 @@ class ArticleController extends Controller
      */
     public function competitors(string $id): JsonResponse
     {
-        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
+        $article = is_numeric($id) 
+            ? Article::where('id', $id)->first() 
+            : Article::where('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
