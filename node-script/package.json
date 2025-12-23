@@ -1,0 +1,22 @@
+{
+  "name": "beyondchats-enhancer",
+  "version": "1.0.0",
+  "description": "Content enhancement script for BeyondChats articles using LLM",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "keywords": ["seo", "content", "llm", "scraping"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@mozilla/readability": "^0.5.0",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
+    "jsdom": "^25.0.1"
+  }
+}
