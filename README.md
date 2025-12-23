@@ -1,4 +1,4 @@
-# 🤖 BeyondChats AI Content Enhancement Platform
+
 
 > An intelligent content enhancement system that uses AI to analyze, compare, and improve blog articles by learning from top-ranking competitors.
 
@@ -7,8 +7,7 @@
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 
 ---
-
-## 📖 Project Overview
+## Project Overview
 
 This platform automatically enhances blog articles using AI by:
 
@@ -18,7 +17,7 @@ This platform automatically enhances blog articles using AI by:
 4. **Enhancing** articles with AI-generated additions (highlighted in yellow)
 5. **Preserving** all original content while adding new value
 
-### ✨ Key Features
+###  Key Features
 
 | Feature | Description |
 |---------|-------------|
@@ -31,7 +30,7 @@ This platform automatically enhances blog articles using AI by:
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -67,7 +66,7 @@ This platform automatically enhances blog articles using AI by:
 
 ---
 
-## 🔄 How the AI Enhancement Works
+## How the AI Enhancement Works
 
 ```mermaid
 flowchart LR
@@ -89,7 +88,7 @@ flowchart LR
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - PHP 8.1+ & Composer
@@ -132,28 +131,7 @@ cp .env.example .env
 npm run enhance:all
 ```
 
----
 
-## 🔑 Environment Variables
-
-### Laravel API (`laravel-api/.env`)
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_DATABASE=beyondchats
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-### Node Worker (`node-script/.env`)
-```env
-LARAVEL_API_URL=http://127.0.0.1:8000/api
-GROQ_API_KEY=your_free_groq_api_key
-GOOGLE_API_KEY=your_google_custom_search_key
-GOOGLE_CX=your_search_engine_id
-```
-
----
 
 ## 📁 Project Structure
 
@@ -179,7 +157,7 @@ Beyond Chats Assignment/
 
 ---
 
-## 🛡️ Security Features
+## Security Features
 
 | Feature | Implementation |
 |---------|----------------|
@@ -190,7 +168,7 @@ Beyond Chats Assignment/
 
 ---
 
-## 📊 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -202,27 +180,7 @@ Beyond Chats Assignment/
 | `GET` | `/api/articles/{slug}/competitors` | Get competitor analysis |
 
 ---
+This is my assigmenet thank you
+Regards
 
-## 🎯 Assignment Requirements Checklist
-
-- [x] **Phase 1**: Laravel API with MySQL storage
-- [x] **Phase 2**: Node.js AI enhancement worker
-- [x] **Phase 3**: React frontend with article comparison
-- [x] **Bonus**: Gap analysis with visual highlighting
-- [x] **Bonus**: Competitor article references
-
----
-
-## 📝 License
-
-MIT License - Feel free to use this project for learning and portfolio purposes.
-
----
-
-## 👤 Author
-
-**Rachit Simac**
-
----
-
-*Built with ❤️ for the BeyondChats Assignment*
+Haji Karim
