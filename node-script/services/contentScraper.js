@@ -25,6 +25,7 @@ export async function scrapeMultipleArticles(urls) {
                     content: content.textContent,
                     htmlContent: content.content,
                     excerpt: content.excerpt || urlInfo.snippet,
+                    image_url: content.image_url,
                 });
                 console.log(`  ✅ Scraped: ${urlInfo.title.substring(0, 50)}...`);
             }
@@ -51,10 +52,21 @@ export async function scrapeArticleContent(url) {
             timeout: 15000,
         });
 
-        // Use JSDOM with Readability for clean content extraction
         const dom = new JSDOM(response.data, { url });
         const reader = new Readability(dom.window.document);
         const article = reader.parse();
+
+        // Extract image (og:image or first image)
+        let imageUrl = null;
+        const metaImage = dom.window.document.querySelector('meta[property="og:image"]');
+        if (metaImage) {
+            imageUrl = metaImage.getAttribute('content');
+        } else {
+            const firstImg = dom.window.document.querySelector('article img, main img, .post-content img');
+            if (firstImg) {
+                imageUrl = firstImg.getAttribute('src');
+            }
+        }
 
         if (article) {
             return {
@@ -64,6 +76,7 @@ export async function scrapeArticleContent(url) {
                 excerpt: article.excerpt,
                 byline: article.byline,
                 length: article.length,
+                image_url: imageUrl,
             };
         }
 

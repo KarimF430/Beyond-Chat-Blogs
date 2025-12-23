@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { getArticle, getCompetitors } from '../services/api';
 import GapAnalysis from '../components/GapAnalysis';
 import CompetitorCard from '../components/CompetitorCard';
@@ -107,6 +108,10 @@ export default function ArticlePage() {
 
     const isEnhanced = article.status === 'updated';
 
+    // Remove the embedded references section from content if it exists
+    // This serves the user request to "remove from above"
+    const contentWithoutReferences = article.content?.replace(/<section class="related-articles-section"[\s\S]*?<\/section>/gi, '') || '';
+
     // Use real author from API, fallback to BeyondChats Team
     const author = article.author || 'BeyondChats Team';
 
@@ -132,11 +137,7 @@ export default function ArticlePage() {
                 </Link>
 
                 <nav className="nav-links">
-                    <a href="#">Product</a>
-                    <a href="#">Pricing</a>
-                    <a href="#">Resources</a>
-                    <a href="#">Contact Us</a>
-                    <a href="#" className="cta-button">Build your free chatbot</a>
+                    {/* Navigation removed as per request */}
                 </nav>
             </header>
 
@@ -201,60 +202,14 @@ export default function ArticlePage() {
                         </div>
                     </div>
 
-                    {/* Article Body */}
-                    <div className="article-body" dangerouslySetInnerHTML={{ __html: article.content }} />
+                    {/* Article Body - Sanitized for Security */}
+                    <div className="article-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(contentWithoutReferences) }} />
                 </article>
 
-                {/* Gap Analysis Panel */}
-                {isEnhanced && article.gap_analysis && (
-                    <aside className="analysis-sidebar">
-                        <button className="toggle-analysis" onClick={() => setShowAnalysis(!showAnalysis)}>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18" style={{ marginRight: '8px' }}>
-                                <circle cx="11" cy="11" r="8" />
-                                <path d="M21 21l-4.35-4.35" />
-                            </svg>
-                            {showAnalysis ? 'Hide Gap Analysis' : 'Show Gap Analysis'}
-                        </button>
-                        {showAnalysis && <GapAnalysis analysis={article.gap_analysis} />}
-                    </aside>
-                )}
+                {/* Gap Analysis Panel - Removed as per request */}
 
-                {/* Competitor Articles Section */}
-                {competitors.length > 0 && (
-                    <section className="competitors-section">
-                        <h2>
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ marginRight: '8px', color: '#3b82f6' }}>
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                            </svg>
-                            Reference Articles Used
-                        </h2>
-                        <p className="section-desc">These competitor articles were analyzed to enhance the content</p>
-                        <div className="competitors-grid">
-                            {competitors.map((comp, i) => (
-                                <CompetitorCard key={i} competitor={comp} index={i + 1} />
-                            ))}
-                        </div>
-                    </section>
-                )}
-
-                {/* References */}
-                {article.references?.length > 0 && competitors.length === 0 && (
-                    <section className="references-section">
-                        <h2>
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style={{ marginRight: '8px', color: '#3b82f6' }}>
-                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
-                            </svg>
-                            References
-                        </h2>
-                        <ol>
-                            {article.references.map((ref, i) => (
-                                <li key={i}>
-                                    <a href={ref} target="_blank" rel="noopener">{ref}</a>
-                                </li>
-                            ))}
-                        </ol>
-                    </section>
-                )}
+                {/* Competitor Articles Section - Removed as per request */}
+                {/* References - Removed as per request */}
 
                 {/* Comments Section */}
                 <section id="comments-section" className="comments-section">
@@ -442,9 +397,26 @@ export default function ArticlePage() {
                                     rel="noopener noreferrer"
                                 >
                                     <div className="related-image">
-                                        <div className="related-image-placeholder">
-                                            {comp.title?.substring(0, 40) || `Reference Article ${i + 1}`}
-                                        </div>
+                                        {comp.image_url ? (
+                                            <>
+                                                <img
+                                                    src={comp.image_url}
+                                                    alt={comp.title}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                                <div className="related-image-placeholder" style={{ display: 'none' }}>
+                                                    {comp.title?.substring(0, 40) || `Reference Article ${i + 1}`}
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="related-image-placeholder">
+                                                {comp.title?.substring(0, 40) || `Reference Article ${i + 1}`}
+                                            </div>
+                                        )}
                                     </div>
                                     <h3>{comp.title || `Reference Article ${i + 1}`}</h3>
                                     <p className="related-meta">Source: {getDomain(comp.source_url)}</p>

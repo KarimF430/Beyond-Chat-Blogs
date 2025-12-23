@@ -70,6 +70,11 @@ async function main() {
             title: enhanced.title,
             content: finalContent,
             original_url: article.original_url,
+            // Preserve original article metadata
+            featured_image: article.featured_image,
+            author: article.author,
+            published_at: article.published_at,
+            excerpt: article.excerpt,
             status: 'updated',
             references: references,
             gap_analysis: gapAnalysis,
@@ -104,18 +109,40 @@ async function main() {
 function generateCitations(competitors) {
     if (competitors.length === 0) return '';
 
-    const citationList = competitors
-        .map((c, i) => `<li><a href="${c.url}" target="_blank" rel="noopener">${c.title}</a></li>`)
-        .join('\n    ');
+    const citationCards = competitors
+        .map((c, i) => {
+            const hostname = new URL(c.url).hostname;
+            const snippet = c.snippet || c.excerpt || 'Read the full article to learn more.';
+            // Clean up snippet if it's too long
+            const cleanSnippet = snippet.length > 120 ? snippet.substring(0, 120) + '...' : snippet;
+
+            const imageHtml = c.image_url
+                ? `<img src="${c.image_url}" alt="${c.title}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.related-image-placeholder').style.display='flex'">
+                   <div class="related-image-placeholder" style="display:none">${c.title}</div>`
+                : `<div class="related-image-placeholder">${c.title}</div>`;
+
+            return `
+    <a href="${c.url}" target="_blank" rel="noopener" class="related-article-card">
+        <div class="related-image">
+            ${imageHtml}
+        </div>
+        <div style="padding: 1rem;">
+            <h3>${c.title}</h3>
+            <div class="related-meta">Source: ${hostname}</div>
+            <p class="related-excerpt">${cleanSnippet}</p>
+        </div>
+    </a>`;
+        })
+        .join('\n');
 
     return `
-<hr>
-<section class="references">
-  <h2>References & Further Reading</h2>
-  <p>This article was enhanced using insights from the following sources:</p>
-  <ol>
-    ${citationList}
-  </ol>
+<section class="related-articles-section">
+  <h2>Reference Articles</h2>
+  <p class="section-subtitle">These articles were analyzed by our AI to enhance the content above</p>
+  <div class="related-articles-grid">
+    ${citationCards}
+  </div>
+  <button class="see-more-btn" onclick="window.open('${competitors[0].url}', '_blank')">See more recommendations</button>
 </section>`;
 }
 

@@ -145,12 +145,16 @@ body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  /* Center the search box */
 }
 
 /* Search Bar - Mobile First */
 .search-bar {
   display: flex;
   width: 100%;
+  position: relative;
+  /* For suggestions dropdown */
 }
 
 .search-bar input {

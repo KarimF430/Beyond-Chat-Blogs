@@ -12,6 +12,7 @@ class CompetitorArticle extends Model
         'source_url',
         'title',
         'content_summary',
+        'image_url',
     ];
 
     /**

@@ -15,8 +15,12 @@ export default function ArticleCard({ article }) {
 
     const isEnhanced = article.status === 'updated';
 
+    const linkPath = isEnhanced
+        ? `/articles/${article.slug || article.id}`
+        : `/blogs/${article.slug || article.id}`;
+
     return (
-        <Link to={`/article/${article.id}`} className="article-card">
+        <Link to={linkPath} className="article-card">
             {/* Image */}
             <div className="article-image">
                 {article.featured_image ? (

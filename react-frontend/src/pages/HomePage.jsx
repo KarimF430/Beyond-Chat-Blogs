@@ -117,34 +117,34 @@ export default function HomePage() {
                                 <path d="M21 21l-4.35-4.35" />
                             </svg>
                         </button>
-                    </div>
 
-                    {/* Autocomplete Suggestions */}
-                    {showSuggestions && searchQuery && (
-                        <div className="search-suggestions">
-                            {articles
-                                .filter(a =>
+                        {/* Autocomplete Suggestions */}
+                        {showSuggestions && searchQuery && (
+                            <div className="search-suggestions">
+                                {articles
+                                    .filter(a =>
+                                        a.title?.toLowerCase().includes(searchQuery.toLowerCase())
+                                    )
+                                    .slice(0, 6)
+                                    .map(article => (
+                                        <Link
+                                            key={article.id}
+                                            to={article.status === 'updated' ? `/articles/${article.slug || article.id}` : `/blogs/${article.slug || article.id}`}
+                                            className="suggestion-item"
+                                            onClick={() => setShowSuggestions(false)}
+                                        >
+                                            {article.title}
+                                        </Link>
+                                    ))
+                                }
+                                {articles.filter(a =>
                                     a.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                                )
-                                .slice(0, 6)
-                                .map(article => (
-                                    <Link
-                                        key={article.id}
-                                        to={`/article/${article.id}`}
-                                        className="suggestion-item"
-                                        onClick={() => setShowSuggestions(false)}
-                                    >
-                                        {article.title}
-                                    </Link>
-                                ))
-                            }
-                            {articles.filter(a =>
-                                a.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                            ).length === 0 && (
-                                    <div className="no-suggestions">No articles found</div>
-                                )}
-                        </div>
-                    )}
+                                ).length === 0 && (
+                                        <div className="no-suggestions">No articles found</div>
+                                    )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </section>
 

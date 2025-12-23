@@ -48,18 +48,39 @@ async function publishArticle(articleData) {
 function generateCitations(competitors) {
     if (competitors.length === 0) return '';
 
-    const citationList = competitors
-        .map((c, i) => `<li><a href="${c.url}" target="_blank" rel="noopener">${c.title}</a> - ${new URL(c.url).hostname}</li>`)
-        .join('\n    ');
+    const citationCards = competitors
+        .map((c, i) => {
+            const hostname = new URL(c.url).hostname;
+            const snippet = c.snippet || c.excerpt || 'Read the full article to learn more.';
+            const cleanSnippet = snippet.length > 120 ? snippet.substring(0, 120) + '...' : snippet;
+
+            const imageHtml = c.image_url
+                ? `<img src="${c.image_url}" alt="${c.title}" loading="lazy" onerror="this.style.display='none';this.parentElement.querySelector('.related-image-placeholder').style.display='flex'">
+                   <div class="related-image-placeholder" style="display:none">${c.title}</div>`
+                : `<div class="related-image-placeholder">${c.title}</div>`;
+
+            return `
+    <a href="${c.url}" target="_blank" rel="noopener" class="related-article-card">
+        <div class="related-image">
+            ${imageHtml}
+        </div>
+        <div style="padding: 1rem;">
+            <h3>${c.title}</h3>
+            <div class="related-meta">Source: ${hostname}</div>
+            <p class="related-excerpt">${cleanSnippet}</p>
+        </div>
+    </a>`;
+        })
+        .join('\n');
 
     return `
-<hr>
-<section class="references">
-  <h2>📚 References & Sources</h2>
-  <p>This article was enhanced using insights from the following top-ranking sources:</p>
-  <ol>
-    ${citationList}
-  </ol>
+<section class="related-articles-section">
+  <h2>Reference Articles</h2>
+  <p class="section-subtitle">These articles were analyzed by our AI to enhance the content above</p>
+  <div class="related-articles-grid">
+    ${citationCards}
+  </div>
+  <button class="see-more-btn" onclick="window.open('${competitors[0].url}', '_blank')">See more recommendations</button>
 </section>`;
 }
 
@@ -147,18 +168,36 @@ async function main() {
     // Fetch all original articles
     console.log('📥 Fetching all original articles...');
     const articles = await fetchAllOriginalArticles();
-    console.log(`📊 Found ${articles.length} original articles to process\n`);
+
+    // Fetch already enhanced articles to avoid duplicates
+    let alreadyEnhancedUrls = new Set();
+    try {
+        const enhancedResponse = await axios.get(`${LARAVEL_API_URL}/articles`, {
+            params: { status: 'updated', per_page: 200 }
+        });
+        const enhancedArticles = enhancedResponse.data.data || enhancedResponse.data;
+        enhancedArticles.forEach(a => {
+            if (a.original_url) alreadyEnhancedUrls.add(a.original_url);
+        });
+        console.log(`ℹ️ Found ${enhancedArticles.length} already enhanced articles.`);
+    } catch (e) {
+        console.warn('⚠️ Could not fetch existing enhanced articles, proceeding without duplicate check.');
+    }
+
+    // Filter articles
+    const articlesToProcess = articles.filter(a => !alreadyEnhancedUrls.has(a.original_url));
+    console.log(`📊 Found ${articles.length} originals, ${articlesToProcess.length} pending enhancement.\n`);
 
     const results = {
         success: 0,
         failed: 0,
-        skipped: 0,
+        skipped: articles.length - articlesToProcess.length,
         errors: []
     };
 
     // Process each article
-    for (let i = 0; i < articles.length; i++) {
-        const result = await processArticle(articles[i], i, articles.length);
+    for (let i = 0; i < articlesToProcess.length; i++) {
+        const result = await processArticle(articlesToProcess[i], i, articlesToProcess.length);
 
         if (result.success) {
             results.success++;
@@ -170,8 +209,13 @@ async function main() {
             });
         }
 
+        if (results.success >= 10) {
+            console.log('🛑 Reached limit of 10 articles. Stopping.');
+            break;
+        }
+
         // Add delay between articles to avoid rate limits
-        if (i < articles.length - 1) {
+        if (i < articlesToProcess.length - 1) {
             console.log(`  ⏳ Waiting ${DELAY_BETWEEN_ARTICLES / 1000}s before next article...`);
             await sleep(DELAY_BETWEEN_ARTICLES);
         }

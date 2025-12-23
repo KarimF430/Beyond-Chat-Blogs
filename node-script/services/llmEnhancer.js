@@ -42,59 +42,48 @@ ${c.content?.substring(0, 2000) || c.snippet}
 `)
         .join('\n');
 
-    const prompt = `You are a professional SEO content editor. Your task is to enhance an article based on top-ranking competitor articles.
+    const prompt = `You are an expert Content Editor & SEO Specialist. Your task is to scientifically enhance a blog article by comparing it against top-ranking competitors text-by-text.
 
-## Original Article
+## CORE OBJECTIVE
+1. **Understand**: Fully scan the Original Article's header and content to grasp the core topic and flow.
+2. **Compare**: Scan the Competitor Articles provided. For each section/point, check:
+   - "Does the competitor explain this better?"
+   - "Does the competitor include valid points/examples/statistics we missed?"
+3. **Enhance**: If you find better explanations or missing points, **MERGE** them into our article.
+   - **UNIQUE WRITING**: Do NOT copy-paste. Rewrite the new points in the same friendly tone as our article to make it 100% unique.
+   - **SEO**: Ensure the new text uses natural semantic keywords.
+4. **PRESERVE**: Do NOT cut, shorten, or remove existing content. Your job is to ADD value, not reduce it. Keep the article "Fullest".
+
+## 1. Original Article (DO NOT MODIFY EXISTING HTML STRUCTURE)
 Title: ${originalArticle.title}
-Content:
-${stripHtml(originalArticle.content).substring(0, 5000)}
+Full Content:
+${originalArticle.content.substring(0, 100000)}
 
-## Reference Articles (Top 2 Ranking on Google)
+## 2. Top Ranking Competitors (SOURCE MATERIAL)
 ${competitorContent}
 
-## Your Enhancement Task
-Enhance the original article to match or exceed the quality of the top-ranking competitors:
+## 3. Enhancement Rules (STRICT ALGORITHM)
+- **Step 1**: Identify gaps. If competitors talk about "X" and we don't, add a paragraph about "X".
+- **Step 2**: Identify quality gaps. If competitors have a "Pro Tip" or "Statistic" we lack, add it.
+- **Step 3**: **Insert** the new content naturally between existing paragraphs or sections.
+- **Step 4**: **HIGHLIGHTING (CRITICAL)**: You MUST wrap **ALL** newly added sentences or paragraphs in `< mark > ` tags.
+    - If you add a new sentence: `< mark > New sentence here.</mark> `
+    - If you rewrite a paragraph significantly: `< mark > Full rewritten paragraph here.</mark > `
+    - **DO NOT MISS THIS STEP.** Visual highlighting is the most important requirement.
 
-### SEO Improvements:
-- Use SEO-optimized headings (H2, H3) with target keywords
-- Improve meta-friendly structure with clear sections
-- Add relevant internal linking opportunities
-- Ensure keyword density matches competitor articles
-
-### Content Quality:
-- Match the depth and comprehensiveness of competitor articles
-- Add missing topics that competitors cover
-- Include relevant statistics, examples, and use cases
-- Create engaging introduction and strong conclusion with CTA
-
-### Formatting:
-- Use clear section headers (H2, H3)
-- Add bullet points and numbered lists where appropriate
-- Keep paragraphs short (2-4 sentences)
-- Match the professional tone of competitor articles
-
-## CRITICAL: Highlight Enhanced Content
-- Wrap ALL newly added or significantly modified text in <mark> tags
-- This shows readers what content was enhanced
-- Example: <mark>This is new content added for SEO improvement.</mark>
-- Original content that remains unchanged should NOT have mark tags
-
-## IMPORTANT RULES
-- DO NOT copy sentences directly from reference articles
-- Write in natural, engaging, human-like prose
-- Keep the article's core message intact
-- Output ONLY the enhanced HTML article content
-- Start with the article title in an H1 tag
-
-## Output Format
-Return ONLY the enhanced HTML article. No markdown, no explanations.`;
+## 4. Output Requirements
+- Return the **FULL HTML** of the article with your enhancements.
+- **Keep ALL original <img> tags exactly where they are.**
+- **Keep ALL original headings and structure.**
+- **Writing Style**: Conversational, friendly, human-like (use "you", "we", contractions).
+- **Formatting**: Output valid HTML only. No markdown blocks.`;
 
     try {
         const chatCompletion = await client.chat.completions.create({
             messages: [{ role: 'user', content: prompt }],
             model: 'llama-3.3-70b-versatile',
             temperature: 0.7,
-            max_tokens: 8000,
+            max_tokens: 30000,
         });
 
         const enhancedContent = chatCompletion.choices[0]?.message?.content || '';

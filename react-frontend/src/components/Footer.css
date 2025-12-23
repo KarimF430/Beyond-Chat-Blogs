@@ -61,8 +61,10 @@
 
 .social-links {
     display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
+    flex-direction: row;
+    /* Horizontal */
+    gap: 1rem;
+    align-items: center;
 }
 
 .social-link {

@@ -42,6 +42,10 @@ class ArticleController extends Controller
             'status' => 'in:original,updated',
             'references' => 'nullable|array',
             'gap_analysis' => 'nullable|array',
+            'featured_image' => 'nullable|url',
+            'author' => 'nullable|string',
+            'published_at' => 'nullable|date',
+            'excerpt' => 'nullable|string',
         ]);
 
         $article = Article::create($validated);
@@ -54,8 +58,25 @@ class ArticleController extends Controller
                     'source_url' => $competitor['source_url'],
                     'title' => $competitor['title'],
                     'content_summary' => $competitor['content_summary'] ?? null,
+                    'image_url' => $competitor['image_url'] ?? null,
                 ]);
             }
+        }
+        
+        // Auto-generate slug if not provided/exists
+        if (!$article->slug) {
+            $slug = \Illuminate\Support\Str::slug($article->title);
+            if ($article->original_url) {
+                $path = parse_url($article->original_url, PHP_URL_PATH);
+                $urlSlug = basename(rtrim($path, "/"));
+                if ($urlSlug) $slug = $urlSlug;
+            }
+            // Ensure unique
+            $count = Article::where('slug', $slug)->where('id', '!=', $article->id)->count();
+            if ($count > 0) $slug .= '-' . $article->id;
+            
+            $article->slug = $slug;
+            $article->save();
         }
 
         return response()->json([
@@ -70,7 +91,10 @@ class ArticleController extends Controller
      */
     public function show(string $id): JsonResponse
     {
-        $article = Article::with('competitorArticles')->find($id);
+        $article = Article::with('competitorArticles')
+                    ->where('id', $id)
+                    ->orWhere('slug', $id)
+                    ->first();
         
         if (!$article) {
             return response()->json([
@@ -90,7 +114,7 @@ class ArticleController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {
-        $article = Article::find($id);
+        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
@@ -106,6 +130,10 @@ class ArticleController extends Controller
             'status' => 'in:original,updated',
             'references' => 'nullable|array',
             'gap_analysis' => 'nullable|array',
+            'featured_image' => 'nullable|url',
+            'author' => 'nullable|string',
+            'published_at' => 'nullable|date',
+            'excerpt' => 'nullable|string',
         ]);
 
         $article->update($validated);
@@ -122,7 +150,7 @@ class ArticleController extends Controller
      */
     public function destroy(string $id): JsonResponse
     {
-        $article = Article::find($id);
+        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
@@ -166,7 +194,7 @@ class ArticleController extends Controller
      */
     public function competitors(string $id): JsonResponse
     {
-        $article = Article::find($id);
+        $article = Article::where('id', $id)->orWhere('slug', $id)->first();
         
         if (!$article) {
             return response()->json([
