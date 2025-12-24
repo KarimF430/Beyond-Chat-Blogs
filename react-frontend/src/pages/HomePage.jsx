@@ -21,9 +21,24 @@ export default function HomePage() {
 
     async function fetchArticles() {
         try {
+            // Check sessionStorage cache first (5 min TTL)
+            const cached = sessionStorage.getItem('articles_cache');
+            const cacheTime = sessionStorage.getItem('articles_cache_time');
+            const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+            if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < CACHE_TTL) {
+                setArticles(JSON.parse(cached));
+                setLoading(false);
+                return;
+            }
+
             setLoading(true);
             const data = await getArticles();
             setArticles(data);
+
+            // Store in sessionStorage
+            sessionStorage.setItem('articles_cache', JSON.stringify(data));
+            sessionStorage.setItem('articles_cache_time', Date.now().toString());
         } catch (error) {
             console.error('Failed to fetch articles:', error);
         } finally {
