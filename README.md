@@ -180,7 +180,7 @@ Beyond Chats Assignment/
 | `GET` | `/api/articles/{slug}/competitors` | Get competitor analysis |
 
 ---
-This is my assigmenet thank you
+This is my assignment thank you
 Regards
 
 Haji Karim
